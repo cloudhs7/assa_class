@@ -7,7 +7,6 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
@@ -22,7 +21,6 @@ import javax.swing.JPanel;
  * @author LeNerd
  * @since 2018-05-23
  */
-
 public class ImagePanel extends JPanel {
 	private static final long serialVersionUID = 1241885397633460571L;
 

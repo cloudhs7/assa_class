@@ -6,12 +6,19 @@ import java.util.ArrayList;
 import board.Board;
 import board.Tile;
 
-public abstract class Piece {
+interface Rule {
+	 public boolean isCheck(int curX, int curY, int color);
+	 public boolean isCheckmate(int curX, int curY);
+	 public boolean isStalemate(int curX, int curY);
+}
+
+public abstract class Piece implements Rule {
 
 	String id;
 	BufferedImage img;
 	public int color;
-	
+	ArrayList<Tile> checkmateCheck;   //add
+	Tile afterMoveTile;            //add
 	public ArrayList<Tile> possibleMove = new ArrayList<Tile>();	
 	
 	//Constructor
@@ -21,13 +28,13 @@ public abstract class Piece {
 		this.img = img;
 	}
 	
-	//Methods
+	/*Methods*/
 	 public abstract ArrayList<Tile> move(int curX, int curY);
 	  
 	 protected void setId(String id){
 		      this.id = id;
 		      }
-		   
+	   
 	 public void setImage(BufferedImage image){
 		      this.img = image;
 		   }
@@ -45,7 +52,8 @@ public abstract class Piece {
 		   }
 	 
 	 
-	 public static boolean isCheck(int curX, int curY,int color /*current location of king*/) {
+	 /*implements interface Rule*/
+	 public boolean isCheck(int curX, int curY,int color /*current location of king*/) {
 		  Piece piece_temp;
 		
 		/*is Check*/
@@ -163,4 +171,38 @@ public abstract class Piece {
 		 /*is not Check*/
 		 return false;
 	}
+	 
+	 public boolean isCheckmate(int curX, int curY){
+	      int i=0;
+	      if(isCheck(curX, curY,Board.board[curX][curY].getColor()) == true){            //이동 전 check 가 true이면서
+	          checkmateCheck = move(curX, curY);         //checkmateCheck는 ArrayList<Tile>로 맨위에 선언함, 여기에다가 possible move 대입
+	          CLABEL:
+	          for(i=0; i<checkmateCheck.size();i++){   //possible move에 저장된 애들 순회
+	                afterMoveTile = checkmateCheck.get(i);//이렇게 하면 움직인 곳에 king 들어감(possible좌표에_
+	                Board.board[curX][curY].setPiece(null);//원래 있던 곳은 piece가 null로 만들어 놓은 후에, king이 움직인 후의 8가지의 경우에 대해 check 검사를 할거임
+	               if(isCheck(checkmateCheck.get(i).getX(),checkmateCheck.get(i).getY(),Board.board[checkmateCheck.get(i).getX()][checkmateCheck.get(i).getY()].getColor())==true)//possibleㅡmove의 각 좌표에 대해 check 검사
+	                     continue CLABEL;            //8가지 경우에 대해 다 검사함
+	               else return false;
+	          }    
+	      if(i==checkmateCheck.size()) return true;      //8가지 경우에 대해 true면 true를 반환하세요.
+	      }
+	      return false;                           //나머진 false
+	    }
+	    
+	 public boolean isStalemate(int curX, int curY){
+	        int j=0;
+	        if(isCheck(curX, curY,Board.board[curX][curY].getColor()) == false){               //이동 전 check 가 false이면서
+	             checkmateCheck = move(curX, curY);         //checkmateCheck는 ArrayList<Tile>로 맨위에 선언함, 여기에다가 possible move 대입
+	             CLABEL:
+	             for(j=0; j<checkmateCheck.size();j++){   //possible move에 저장된 애들 순회
+	                   afterMoveTile = checkmateCheck.get(j);//이렇게 하면 움직인 곳에 king 들어감(possible좌표에_
+	                   Board.board[curX][curY].setPiece(null);//원래 있던 곳은 piece가 null로 만들어 놓은 후에, king이 움직인 후의 8가지의 경우에 대해 check 검사를 할거임
+	                  if(isCheck(checkmateCheck.get(j).getX(),checkmateCheck.get(j).getY(),Board.board[checkmateCheck.get(j).getX()][checkmateCheck.get(j).getY()].getColor())==true)//possiblemove의 각 좌표에 대해 check 검사
+	                        continue CLABEL;            //8가지 경우에 대해 다 검사함
+	                  else return false;
+	             }    
+	         if(j==checkmateCheck.size()) return true;      //8가지 경우에 대해 true면 true를 반환하세요.
+	         }
+	        return false;
+	     }
 }
